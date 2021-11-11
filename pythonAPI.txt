@@ -1,0 +1,19 @@
+import jenkins
+
+server = jenkins.Jenkins('http://localhost:8080', username='admin', password='123')
+user = server.get_whoami()
+version = server.get_version()
+print('Hello %s from Jenkins %s' % (user['fullName'], version))
+
+# my_job = server.get_job_config('test')
+# print(my_job) # prints XML configuration
+
+# file = open('config.xml', 'w')
+# file.write(my_job)
+# file.close()
+
+# server.build_job('test')
+
+file = open('config.xml', 'r')
+my_job = file.read()
+server.create_job('pythonjob', my_job)

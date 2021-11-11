@@ -1,0 +1,39 @@
+def secrets = [
+  [path: 'secret/adding', engineVersion: 2, secretValues: [
+    [envVar: 'Salam', vaultKey: 'value']]],
+]
+def wrsec = [
+  [path: 'secret/adding', engineVersion: 2, secretValues: [
+      [envVar: 'datatoput', vaultKey: 'value']]],
+]
+def configuration = [vaultUrl: 'http://127.0.0.1:8200',  vaultCredentialId: 'my-role-id', engineVersion: 2]
+                      
+pipeline {
+    agent any
+    
+    environment{ 
+        // CASC_VAULT_APPROLE_SECRET="7ee1869b-3440-eeae-effc-42ed423e9294"
+        CASC_VAULT_TOKEN="s.UFygFse5xFha3jXswD3p5N4V"
+        //VAULT_TOKEN='s.UFygFse5xFha3jXswD3p5N4V'
+        VAULT_ADDR='http://127.0.0.1:8200'
+    }
+    
+    stages{   
+      stage('ReadingVault') {
+        steps {
+          withVault([configuration: configuration, vaultSecrets: secrets]) {
+            println "$env.Salam"
+            }
+        }  
+      }
+      
+      stage('Writing Vault'){
+          steps{
+              
+              sh "vault login token=s.UFygFse5xFha3jXswD3p5N4V"
+              sh "vault kv put secret/adding @somesecret.json"
+            
+          }
+      }
+    }
+}
